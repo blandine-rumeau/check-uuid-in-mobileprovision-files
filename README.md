@@ -50,7 +50,7 @@ python3 check_uuid.py <UUID> <folder_path>
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles
 ```
 
-### Check a single .mobileprovision file
+### Check a single `.mobileprovision` file
 
 ```bash
 python3 check_uuid.py <UUID> <file_path>
