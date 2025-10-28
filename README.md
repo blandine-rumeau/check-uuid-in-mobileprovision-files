@@ -46,7 +46,7 @@ python3 check_uuid.py <UUID> <folder_path>
 
 #### Example:
 
-```bash
+```
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles
 ```
 
@@ -58,7 +58,7 @@ python3 check_uuid.py <UUID> <file_path>
 
 #### Example:
 
-```bash
+```
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles/Dev.mobileprovision
 ```
 
@@ -72,8 +72,52 @@ python3 check_uuid.py --help
 
 #### Output:
 
-```bash
+```
 Usage: python3 check_uuid.py <UUID> <folder_or_file_path>
 Recursively checks all .mobileprovision files in the given folder,
 or a single .mobileprovision file, for the UUID.
+```
+
+## Example Output
+
+### Case 1: All files contain UUID
+
+```
+Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
+
+✅ UUID found in all .mobileprovision files!
+
+Checked 7 files total.
+```
+
+### Case 2: Some files missing UUID
+
+```
+Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
+
+❌ UUID missing in the following files:
+ - /path/to/file1.mobileprovision
+
+✅ UUID found in the following files:
+ - /path/to/file2.mobileprovision
+ - /path/to/file3.mobileprovision
+
+Checked 7 files total.
+```
+
+### Case 3: Some files unreadable
+
+```
+Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
+
+⚠️ Could not read /path/to/file4.mobileprovision: [Error message]
+
+❌ UUID missing in the following files:
+ - /path/to/file1.mobileprovision
+
+✅ UUID found in the following files:
+ - /path/to/file2.mobileprovision
+ - /path/to/file3.mobileprovision
+
+Checked 7 files total.
 ```
