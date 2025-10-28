@@ -1,6 +1,6 @@
 # check_uuid.py
 
-Recursively checks all `.mobileprovision` files in a folder for the presence of a given UUID and lists the missing files.
+Recursively checks all `.mobileprovision` files in a folder, or a single `.mobileprovision` file, for the presence of a given UUID and lists missing and matching files.
 
 ## Author
 
@@ -13,13 +13,14 @@ MIT License – see [LICENSE](LICENSE) file.
 ## Description
 
 This Python script is useful for iOS developers, DevOps, or anyone working with provisioning profiles.  
-It searches through a folder and its subfolders, identifies `.mobileprovision` files, and reports which ones contain (or are missing) a specified UUID.
+It searches through a folder and its subfolders, or checks a single `.mobileprovision` file, and reports which ones contain (or are missing) a specified UUID.
 
 ---
 
 ## Features
 
 - Recursively scans all `.mobileprovision` files in a folder
+- Supports checking a single `.mobileprovision` file
 - Checks for the presence of a UUID
 - Lists files that are missing the UUID
 - Lists files that contain the UUID (if not all files match)
@@ -37,6 +38,8 @@ It searches through a folder and its subfolders, identifies `.mobileprovision` f
 
 ## Usage
 
+### Check a folder
+
 ```bash
 python3 check_uuid.py <UUID> <folder_path>
 ```
@@ -45,6 +48,18 @@ python3 check_uuid.py <UUID> <folder_path>
 
 ```bash
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles
+```
+
+### Check a single .mobileprovision file
+
+```bash
+python3 check_uuid.py <UUID> <file_path>
+```
+
+#### Example:
+
+```bash
+python3 check_uuid.py 12345678-ABCD /Users/me/Profiles/Dev.mobileprovision
 ```
 
 ## Help
@@ -58,6 +73,7 @@ python3 check_uuid.py --help
 #### Output:
 
 ```bash
-Usage: python3 check_uuid.py <UUID> <folder_path>
-Recursively checks all .mobileprovision files in the given folder for the UUID.
+Usage: python3 check_uuid.py <UUID> <folder_or_file_path>
+Recursively checks all .mobileprovision files in the given folder,
+or a single .mobileprovision file, for the UUID.
 ```
