@@ -1,4 +1,5 @@
 # check_uuid.py
+[![Python Tests](https://github.com/blandine-rumeau/check-uuid-in-mobileprovision-files/actions/workflows/python-tests.yml/badge.svg)](https://github.com/blandine-rumeau/check-uuid-in-mobileprovision-files/actions/workflows/python-tests.yml)
 
 A Python utility to check for a given UUID inside `.mobileprovision` files — either in a folder, a single file, or even inside an `.ipa` archive.
 
