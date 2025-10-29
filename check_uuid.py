@@ -3,73 +3,119 @@
 check_uuid.py
 Author: Blandine
 Year: 2025
-Description: Recursively checks all .mobileprovision files in a folder
-             or a single .mobileprovision file for the presence of a given UUID
+Description: Checks all .mobileprovision files in a folder, a single .mobileprovision file,
+             or inside an .ipa archive for the presence of a given UUID,
              and lists missing and matching files.
 License: MIT
 """
 from pathlib import Path
 import sys
-import os
+import tempfile
+import zipfile
 
-def find_missing_uuid(uuid, input_path):
+def check_uuid_in_file(uuid, file_path):
+    """
+    Returns True if the UUID is present in the given .mobileprovision file, False otherwise.
+    Handles unreadable files gracefully.
+    """
+    try:
+        with open(file_path, "rb") as f:
+            data = f.read()
+            return uuid.encode() in data
+    except Exception as e:
+        print(f"⚠️ Could not read {file_path}: {e}")
+        return False
+
+def check_files_for_uuid(uuid, files):
+    """
+    Checks a list of .mobileprovision files for the UUID.
+    Returns (missing_files, matching_files, total_files)
+    """
     missing_files = []
     matching_files = []
 
-    path = Path(input_path)
-
-    # Determine if input is a folder or a single file
-    if path.is_dir():
-        files = list(path.rglob("*.mobileprovision"))
-    elif path.is_file() and path.suffix == ".mobileprovision":
-        files = [path]
-    else:
-        print(f"❌ {input_path} is neither a folder nor a .mobileprovision file.")
-        sys.exit(1)
-
+    for f in files:
+        if check_uuid_in_file(uuid, f):
+            matching_files.append(f)
+        else:
+            missing_files.append(f)
+    
     total_files = len(files)
-    print(f"Found {total_files} .mobileprovision files, checking for UUID {uuid}...\n")
+    return missing_files, matching_files, total_files
 
-    for file_path in files:
-        try:
-            with open(file_path, "rb") as f:
-                data = f.read()
-                if uuid.encode() in data:
-                    matching_files.append(str(file_path))
-                else:
-                    missing_files.append(str(file_path))
-        except Exception as e:
-            print(f"⚠️ Could not read {file_path}: {e}")
+def report_results(missing_files, matching_files, total_files):
+    if total_files == 0:
+        print("\n⚠️  No .mobileprovision files found.")
+        return
 
-    # Output results
-    if total_files == len(matching_files):
+    if len(matching_files) == total_files:
         print("\n✅ UUID found in all .mobileprovision files!")
     else:
-        if missing_files:
-            print("\n❌ UUID missing in the following files:")
-            for f in missing_files:
-                print(" -", f)
         if matching_files:
             print("\n✅ UUID found in the following files:")
             for f in matching_files:
-                print(" -", f)
+                print(f"  - {f}")
 
-    print(f"\nChecked {total_files} files total.\n")
-    return missing_files
+        if missing_files:
+            print("\n❌ UUID missing in the following files:")
+            for f in missing_files:
+                print(f"  - {f}")
 
 if __name__ == "__main__":
-    # Show help if requested
+    # Simple sys.argv parsing with help
     if len(sys.argv) == 2 and sys.argv[1] in ("--help", "-h"):
-        print("Usage: python3 check_uuid.py <UUID> <folder_or_file_path>")
-        print("Recursively checks all .mobileprovision files in the given folder, or a single .mobileprovision file, for the UUID.")
+        print("Usage: python3 check_uuid.py <UUID> <path_to_folder_or_file_or_ipa>")
+        print("Checks .mobileprovision files in the given folder, a single file, or inside an .ipa for the UUID.")
         sys.exit(0)
 
-    # Validate arguments
     if len(sys.argv) != 3:
-        print("Usage: python3 check_uuid.py <UUID> <folder_or_file_path>")
+        print("Usage: python3 check_uuid.py <UUID> <path_to_folder_or_file_or_ipa>")
         sys.exit(1)
 
     uuid = sys.argv[1]
-    input_path = sys.argv[2]
+    input_path = Path(sys.argv[2])
 
-    missing = find_missing_uuid(uuid, input_path)
+    # Detect input type
+    if input_path.is_dir():
+        mode = "folder"
+    elif input_path.suffix == ".mobileprovision":
+        mode = "file"
+    elif input_path.suffix == ".ipa":
+        mode = "ipa"
+    else:
+        print(f"❌ Unsupported input type: {input_path}")
+        sys.exit(1)
+
+    # Prepare the list of files depending on mode
+    if mode == "ipa":
+        print(f"Detected input type: ipa")
+        print(f"Unpacking {input_path.name}...")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with zipfile.ZipFile(input_path, 'r') as zip_ref:
+                zip_ref.extractall(tmpdir)
+
+            extracted_path = Path(tmpdir)
+            files = list(extracted_path.rglob("*.mobileprovision"))
+            print(f"Found {len(files)} .mobileprovision file(s), checking for UUID {uuid}...")
+
+            missing_files, matching_files, total_files = check_files_for_uuid(uuid, files)
+
+    elif mode == "folder":
+        print(f"Detected input type: folder")
+        files = list(input_path.rglob("*.mobileprovision"))
+        print(f"Found {len(files)} .mobileprovision file(s), checking for UUID {uuid}...")
+
+        missing_files, matching_files, total_files = check_files_for_uuid(uuid, files)
+
+    elif mode == "file":
+        print(f"Detected input type: file")
+        files = [input_path]
+        print(f"Checking single .mobileprovision file {input_path} for UUID {uuid}...")
+
+        missing_files, matching_files, total_files = check_files_for_uuid(uuid, files)
+
+    # Report results
+    report_results(missing_files, matching_files, total_files)
+
+    # Print total files checked
+    print(f"\nChecked {total_files} file{'s' if total_files != 1 else ''} total.")

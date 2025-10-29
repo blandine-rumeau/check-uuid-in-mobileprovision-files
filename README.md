@@ -1,10 +1,10 @@
 # check_uuid.py
 
-Recursively checks all `.mobileprovision` files in a folder, or a single `.mobileprovision` file, for the presence of a given UUID and lists missing and matching files.
+Recursively checks all `.mobileprovision` files in a folder, a single `.mobileprovision` file, or inside an `.ipa` archive for the presence of a given UUID and lists missing and matching files.
 
 ## Author
 
-**Blandine**, 2025
+**Blandine Rumeau**, 2025
 
 ## License
 
@@ -12,27 +12,28 @@ MIT License – see [LICENSE](LICENSE) file.
 
 ## Description
 
-This Python script is useful for iOS developers, DevOps, or anyone working with provisioning profiles.  
-It searches through a folder and its subfolders, or checks a single `.mobileprovision` file, and reports which ones contain (or are missing) a specified UUID.
+This Python script is useful for iOS developers, DevOps, or anyone working with provisioning profiles.
+It searches through a folder, a single file, or an `.ipa` archive and reports which `.mobileprovision` files contain (or are missing) a specified UUID.
 
 ---
 
 ## Features
 
-- Recursively scans all `.mobileprovision` files in a folder
-- Supports checking a single `.mobileprovision` file
-- Checks for the presence of a UUID
-- Lists files that are missing the UUID
-- Lists files that contain the UUID (if not all files match)
-- Handles unreadable files gracefully
-- Provides clear terminal output
+* Recursively scans all `.mobileprovision` files in a folder
+* Supports checking a single `.mobileprovision` file
+* Supports checking `.mobileprovision` files inside an `.ipa`
+* Checks for the presence of a UUID
+* Lists files that are missing the UUID
+* Lists files that contain the UUID (if not all files match)
+* Handles unreadable files gracefully
+* Provides clear terminal output with emojis for quick visibility
 
 ---
 
 ## Requirements
 
-- Python 3.6+
-- Works on macOS, Linux, and Windows (with Python 3 installed)
+* Python 3.6+
+* Works on macOS, Linux, and Windows (with Python 3 installed)
 
 ---
 
@@ -44,43 +45,54 @@ It searches through a folder and its subfolders, or checks a single `.mobileprov
 python3 check_uuid.py <UUID> <folder_path>
 ```
 
-#### Example:
+Example:
 
-```
+```bash
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles
 ```
 
-### Check a single .mobileprovision file
+### Check a single `.mobileprovision` file
 
 ```bash
 python3 check_uuid.py <UUID> <file_path>
 ```
 
-#### Example:
+Example:
 
-```
+```bash
 python3 check_uuid.py 12345678-ABCD /Users/me/Profiles/Dev.mobileprovision
 ```
 
-## Help
+### Check an `.ipa` file
 
-Print a short usage guide:
+```bash
+python3 check_uuid.py <UUID> <ipa_file_path>
+```
+
+Example:
+
+```bash
+python3 check_uuid.py 12345678-ABCD /Users/me/Apps/MyApp.ipa
+```
+
+### Help
 
 ```bash
 python3 check_uuid.py --help
 ```
 
-#### Output:
+Output:
 
 ```
-Usage: python3 check_uuid.py <UUID> <folder_or_file_path>
-Recursively checks all .mobileprovision files in the given folder,
-or a single .mobileprovision file, for the UUID.
+Usage: python3 check_uuid.py <UUID> <path_to_folder_or_file_or_ipa>
+Checks .mobileprovision files in the given folder, a single file, or inside an .ipa for the UUID.
 ```
+
+---
 
 ## Example Output
 
-### Case 1: All files contain UUID
+**Case 1: All files contain UUID**
 
 ```
 Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
@@ -90,7 +102,7 @@ Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
 Checked 7 files total.
 ```
 
-### Case 2: Some files missing UUID
+**Case 2: Some files missing UUID**
 
 ```
 Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
@@ -105,7 +117,7 @@ Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
 Checked 7 files total.
 ```
 
-### Case 3: Some files unreadable
+**Case 3: Some files unreadable**
 
 ```
 Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
@@ -121,3 +133,20 @@ Found 7 .mobileprovision files, checking for UUID 12345678-ABCD...
 
 Checked 7 files total.
 ```
+
+**Case 4: Checking an IPA**
+
+```
+Detected input type: ipa
+Unpacking MyApp.ipa...
+Found 1 provisioning file(s) inside IPA.
+
+✅ UUID found in all .mobileprovision files!
+Checked 1 file total.
+```
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
